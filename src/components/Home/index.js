@@ -2,11 +2,16 @@ import React, { Component } from 'react'
 import './styles.css'
 import firebase from '../../firebase'
 
+import Header from './Header/index.js'
+
 class Home extends Component {
 
-  componentDidMount () {
-    const user = firebase.auth().currentUser
-    console.log(user)
+  state = {
+    user: null
+  }
+
+  componentWillMount () {
+    this.setState({ user: firebase.auth().currentUser})
   }
 
   logout () {
@@ -20,7 +25,7 @@ class Home extends Component {
   render () {
     return (
       <div>
-        <h1>Welcome to Capture!</h1>
+        <Header user={this.state.user} />
         <button className='btn btn-default' onClick={() => this.logout()}>Log Out</button>
       </div>
     )
