@@ -3,35 +3,27 @@ import './styles.css'
 import { Link } from 'react-router'
 import firebase from './../../firebase'
 import SignUp from './SignUp'
-import { hashHistory } from 'react-router'
+import router, { hashHistory } from 'react-router'
 
 class LogIn extends Component {
 
-  componentDidMount () {
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        hashHistory.replace(user.uid)
-      } else {
-        console.log('no user signed in')
-      }
-    })
+  state = {
+    signingUp: false,
+    errorMessage: ''
   }
 
-  state = {
-    signingUp: false
+  componentDidMount () {
+
   }
 
   logIn = () => {
-    firebase.auth().signInWithEmailAndPassword(this.refs.email.value, this.refs.password.value).catch((error) => {
-      console.log(error)
+    firebase.auth().signInWithEmailAndPassword(this.refs.email.value, this.refs.password.value).then(function(response){
+      hashHistory.push('/home')
+    }).catch((error) => {
+      this.setState({ errorMessage: error.message })
     })
   }
 
-  signUp (email, password, name) {
-    firebase.auth().createUserWithEmailAndPassword(email, password).catch((error) => {
-      console.log(error)
-    })
-  }
 
   render () {
     return (
@@ -45,14 +37,18 @@ class LogIn extends Component {
           <label>Password</label>
           <input type='text' placeholder='password' ref='password' />
         </div>
+        {this.displayErrorMessage()}
         <div className='buttons-container'>
           <button className='btn btn-primary' onClick={this.logIn}>Log In</button>
           <button className='btn btn-default' onClick={() => {this.setState({ signingUp: true })}}>Create An Account</button>
         </div>
-        {this.state.signingUp && <SignUp signUp={this.signUp} />}
+        {this.state.signingUp && <SignUp />}
       </div>
-
     )
+  }
+
+  displayErrorMessage() {
+    return this.state.errorMessage.length > 0 && <div className='error-div'><h5>{this.state.errorMessage}</h5></div>
   }
 }
 
